@@ -152,14 +152,14 @@ class _ListNotesState extends State<ListNotes> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return ViewNote(
-            notes: widget.notes,
-            key: null,
-          );
-        }));
-      },
+      // onTap: () {
+      //   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      //     return ViewNote(
+      //       notes: widget.notes,
+      //       key: null,
+      //     );
+      //   }));
+      // },
       child: Card(
         child: Row(
           children: [
@@ -180,16 +180,25 @@ class _ListNotesState extends State<ListNotes> {
                   style: TextStyle(fontSize: 14),
                 ),
                 trailing: IconButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) {
-                      return EditNotes(docid: widget.docid, list: widget.notes);
-                    }));
+                  onPressed: () async {
+                    // Navigator.of(context)
+                    //     .push(MaterialPageRoute(builder: (context) {
+                    //   return EditNotes(docid: widget.docid, list: widget.notes);
+                    // }));
                     // var db = FirebaseFirestore.instance;
                     // db.collection("notes").doc(widget.docid).delete().then(
                     //       (doc) => print("Document deleted"),
                     //       onError: (e) => print("Error updating document $e"),
                     //     );
+                    // ignore: unused_local_variable
+                    // photoRef = mFirebaseStorage
+                    //     .getReferenceFromUrl(widget.notes['imageurl']);
+                    // photoRef.delete();
+                    print(widget.notes['imageurl']);
+                    final storageRef = FirebaseStorage.instance;
+                    final desertRef = storageRef.ref('1.jpg');
+                    await desertRef.delete();
+
                     // setState(() {});
                   },
                   icon: Icon(Icons.edit),

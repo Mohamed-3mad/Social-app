@@ -38,10 +38,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: islogin == false
-          ? Login()
-          : HomePage(
-            ),
+      home: islogin == false ? Login() : HomePage(),
       // home: Test(),
       theme: ThemeData(
           // fontFamily: "NotoSerif",

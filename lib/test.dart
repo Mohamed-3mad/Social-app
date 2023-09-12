@@ -15,6 +15,19 @@ class Test extends StatefulWidget {
 }
 
 class _TestState extends State<Test> {
+  CollectionReference userref = FirebaseFirestore.instance.collection("notes");
+  getData() async {
+    CollectionReference userref =
+        FirebaseFirestore.instance.collection("users");
+    print(",,,,,,,,,,,,,,,,,,,,,,,,,");
+    print(userref);
+    await userref.where(true).get();
+    //  List<QueryDocumentSnapshot> y = x.docs;
+    // y.forEach((element) {
+    //   print(element);
+    // });
+  }
+
   CollectionReference notesref = FirebaseFirestore.instance.collection("notes");
 
   late Reference ref;
@@ -23,23 +36,26 @@ class _TestState extends State<Test> {
 
   var title, note, imageurl;
   @override
+  void initState() {
+    // getData();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text('Test'),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Center(
-                child: ElevatedButton(
-              onPressed: () async {
-                showBottomSheet(context);
-              },
-              child: Text("Upload Image"),
-            ))
-          ],
-        ));
+        body: FutureBuilder(
+            future: userref
+                .where("userid",
+                    isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+                .get(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) return Text("data");
+              return CircularProgressIndicator.adaptive();
+            }));
   }
 
   showBottomSheet(context) {
