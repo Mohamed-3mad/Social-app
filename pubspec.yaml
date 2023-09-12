@@ -1,0 +1,47 @@
+name: notes_app
+description: A new Flutter project.
+
+publish_to: 'none' 
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.0 <3.0.0'
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  jiffy: ^6.2.1
+  image_picker: ^1.0.4
+  http: ^1.1.0
+  shared_preferences: ^2.0.3
+  firebase_core: ^2.15.1
+  firebase_storage: ^11.2.6
+  cloud_firestore: ^4.9.1
+  firebase_messaging: ^14.6.7
+  firebase_auth: ^4.9.0
+  awesome_dialog: ^3.1.0
+  dropdown_search: ^5.0.6
+  firebase_app_check: ^0.1.5+2
+
+dev_dependencies:
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.2
+  flutter_test:
+    sdk: flutter
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/logo.png"
+
+flutter_native_splash:
+  color: "#42a5f5"
+  image: images/splash.png
+  android_gravity: fill
+
+flutter:
+  uses-material-design: true
+  assets:
+    - images/
