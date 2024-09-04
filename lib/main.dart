@@ -1,60 +1,157 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:notes_app/auth/login.dart';
-import 'package:notes_app/auth/signup.dart';
-import 'package:notes_app/home/homepage.dart';
-import 'package:notes_app/test.dart';
-import 'package:notes_app/testtwo.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hexcolor/hexcolor.dart';
+import 'package:notes_app/layout/cubit/cubit.dart';
+import 'package:notes_app/modules/social_login/social_login_screen.dart';
+import 'package:notes_app/shared/bloc_observer.dart';
+import 'package:notes_app/shared/components/constants.dart';
+import 'package:notes_app/layout/social_layout.dart';
+import 'package:notes_app/shared/cubit/cubit.dart';
+import 'package:notes_app/shared/cubit/states.dart';
+import 'package:notes_app/shared/network/local/cache_helper.dart';
+import 'package:notes_app/shared/styles/themes.dart';
+import 'package:splash_screen_view/SplashScreenView.dart';
 
-import 'crud/addnotes.dart';
+// import 'firebase_options.dart';
 
-bool? islogin;
+// Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   print('on background message');
+//   print(message.data.toString());
 
-Future backgroudMessage(RemoteMessage message) async {
-  print("=================== BackGroud Message ========================");
-  print("${message.notification!.body}");
-}
+//   showToast(
+//     text: 'on background message',
+//     state: ToastStates.SUCCESS,
+//   );
+// }
 
 void main() async {
+  // بيتأكد ان كل حاجه هنا في الميثود خلصت و بعدين يتفح الابلكيشن
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp();
+  // token = await FirebaseMessaging.instance.getToken();
+  print(' token is :  $token');
+  // foreground fcm
+  // FirebaseMessaging.onMessage.listen((event)
+  // {
+  //   print('on message');
+  //   print(event.data.toString());
 
-  FirebaseMessaging.onBackgroundMessage(backgroudMessage);
-
-  var user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    islogin = false;
+  //   showToast(text: 'on message', state: ToastStates.SUCCESS,);
+  // });
+  // // when click on notification to open app
+  // FirebaseMessaging.onMessageOpenedApp.listen((event)
+  // {
+  //   print('on message opened app');
+  //   print(event.data.toString());
+  //   showToast(text: 'on message opened app', state: ToastStates.SUCCESS,);
+  // });
+  // // background fcm
+  // FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  Bloc.observer = MyBlocObserver();
+  await CacheHelper.init();
+  bool ?isDark = CacheHelper.getData(key: 'isDark');
+  Widget? widget;
+  uId = CacheHelper.getData(key: 'uId');
+  if (uId != null) {
+    widget = SocialLayout();
   } else {
-    islogin = true;
+    widget = SocialLoginScreen();
   }
-  runApp(MyApp());
+  runApp(MyApp(
+    isDark: isDark,
+    startWidget: widget,
+  ));
 }
 
 class MyApp extends StatelessWidget {
+  final bool ?isDark;
+  final Widget? startWidget;
+
+  MyApp({
+    this.isDark,
+    this.startWidget,
+  });
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: islogin == false ? Login() : HomePage(),
-      // home: Test(),
-      theme: ThemeData(
-          // fontFamily: "NotoSerif",
-          primaryColor: Colors.blue,
-          textTheme: TextTheme(
-            titleLarge: TextStyle(fontSize: 20, color: Colors.white),
-            headlineSmall: TextStyle(fontSize: 30, color: Colors.blue),
-            bodyMedium: TextStyle(fontSize: 20, color: Colors.black),
-          )),
-      routes: {
-        "login": (context) => Login(),
-        "signup": (context) => SignUp(),
-        "homepage": (context) => HomePage(),
-        "addnotes": (context) => AddNotes(),
-        "testtwo": (context) => TestTwo()
-      },
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (BuildContext context) => AppCubit()
+              ..changeAppMode(
+                // fromShared: isDark!,
+              ),
+          ),
+          BlocProvider(
+            create: (BuildContext context) => SocialCubit()
+              ..getUserData()
+              ..getPosts(),
+          ),
+        ],
+        child: BlocConsumer<AppCubit, AppStates>(
+          listener: (context, state) {},
+          builder: (context, state) {
+            return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              theme: lightTheme,
+              darkTheme: darkTheme,
+              themeMode: AppCubit.get(context).isDark!
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
+              home: SplashScreenView(
+                navigateRoute: startWidget,
+                duration: 5000,
+                imageSize: 130,
+                imageSrc: "assets/images/s.png",
+                text: "Social App",
+                textType: TextType.ColorizeAnimationText,
+                textStyle: TextStyle(
+                  fontSize: 40.0,
+                ),
+                colors: [
+                  Colors.red,
+                  Colors.deepOrange,
+                  Colors.yellow,
+                  Colors.redAccent,
+                ],
+                backgroundColor: AppCubit.get(context).isDark!
+                    ? HexColor('333739')
+                    : Colors.white,
+              ),
+            );
+          },
+        ));
   }
-}
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
